@@ -1,8 +1,11 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 import json
 import os
+import re
+from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Required for session management
 
 DATA_FILE = 'data.json'
 
@@ -26,41 +29,65 @@ def interact():
     
     if not user_input:
         return jsonify({"error": "Input is required"}), 400
-    
-    parts = user_input.split(' ', 1)
-    command = parts[0].lower()
+
+    user_input = user_input.lower().strip()
     response = ""
 
-    if command in ["log", "remember"]:
-        if len(parts) < 2:
-            return jsonify({"error": "Please provide the item and location in the format 'log item at location'"}), 400
-        
-        item_parts = parts[1].rsplit(' at ', 1)
-        if len(item_parts) < 2:
-            return jsonify({"error": "Please provide the item and location in the format 'log item at location'"}), 400
-        
-        item = item_parts[0].strip()
-        location = item_parts[1].strip()
+    # Check if there is an ongoing session for logging an item
+    if 'pending_item' in session:
+        item = session.pop('pending_item')
+        location = user_input.strip()
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         data = load_data()
-        data[item] = location
+        data[item] = {"location": location, "timestamp": timestamp}
         save_data(data)
         
-        response = f"{item} logged at {location}"
-    
-    elif command in ["find", "where"]:
-        if len(parts) < 2:
-            return jsonify({"error": "Please provide the item to find in the format 'find item'"}), 400
-        
-        item = parts[1].strip()
-        data = load_data()
-        location = data.get(item, "Item not found")
-        
-        response = f"{item} is at {location}"
-    
-    else:
-        return jsonify({"error": "Unrecognized command. Use 'log item at location' or 'find item'"}), 400
+        response = f"{item} logged at {location} on {timestamp}"
+        return jsonify({"message": response}), 200
 
+    # Check for logging commands
+    log_match = re.match(r'^(log|remember) (.+) at (.+)$', user_input)
+    if log_match:
+        item = log_match.group(2).strip()
+        location = log_match.group(3).strip()
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        data = load_data()
+        data[item] = {"location": location, "timestamp": timestamp}
+        save_data(data)
+        
+        response = f"{item} logged at {location} on {timestamp}"
+        return jsonify({"message": response}), 200
+
+    # Check for find commands
+    find_match = re.match(r'^(find|where are my|where is my) (.+)$', user_input)
+    if find_match:
+        item = find_match.group(2).strip()
+        data = load_data()
+        item_data = data.get(item, None)
+        
+        if item_data:
+            location = item_data['location']
+            timestamp = item_data['timestamp']
+            response = f"{item} is at {location}. Last information saved on {timestamp}"
+        else:
+            response = "Item not found"
+        
+        return jsonify({"message": response}), 200
+
+    # For any input, first check if the item is in the database
+    data = load_data()
+    item_data = data.get(user_input, None)
+    if item_data:
+        location = item_data['location']
+        timestamp = item_data['timestamp']
+        response = f"{user_input} is at {location}. Last information saved on {timestamp}"
+        return jsonify({"message": response}), 200
+
+    # If the item is not in the database, ask for location
+    session['pending_item'] = user_input
+    response = f"Where do you want to keep {user_input}?"
     return jsonify({"message": response}), 200
 
 if __name__ == '__main__':

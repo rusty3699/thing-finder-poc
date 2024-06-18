@@ -1,3 +1,10 @@
 {
-    "keys": "red bag"
+    "water bottle": {
+        "location": "bag",
+        "timestamp": "2024-06-18 12:14:28"
+    },
+    "pen": {
+        "location": "desk",
+        "timestamp": "2024-06-18 12:15:18"
+    }
 }
