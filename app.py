@@ -46,6 +46,25 @@ def interact():
         response = f"{item} logged at {location} on {timestamp}"
         return jsonify({"message": response}), 200
 
+    # Check if there is an ongoing session for confirming item location
+    if 'confirm_item' in session:
+        item = session.pop('confirm_item')
+        if user_input in ['yes', 'y']:
+            # User confirmed the item is still there, update the timestamp
+            data = load_data()
+            data[item]['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            save_data(data)
+            response = f"{item} location confirmed. Timestamp updated."
+        elif user_input in ['no', 'n']:
+            # User indicated the item is no longer there, prompt for new location
+            session['pending_item'] = item
+            response = f"Where is the {item} now?"
+        else:
+            # Invalid input, prompt again
+            session['confirm_item'] = item
+            response = "Please answer with 'yes' or 'no'. Is the item still there?"
+        return jsonify({"message": response}), 200
+
     # Check for logging commands
     log_match = re.match(r'^(log|remember) (.+) at (.+)$', user_input)
     if log_match:
@@ -70,7 +89,8 @@ def interact():
         if item_data:
             location = item_data['location']
             timestamp = item_data['timestamp']
-            response = f"{item} is at {location}. Last information saved on {timestamp}"
+            response = f"{item} is at {location}. Last information saved on {timestamp}. Is the item still there? (yes/no)"
+            session['confirm_item'] = item
         else:
             response = "Item not found"
         
@@ -82,7 +102,8 @@ def interact():
     if item_data:
         location = item_data['location']
         timestamp = item_data['timestamp']
-        response = f"{user_input} is at {location}. Last information saved on {timestamp}"
+        response = f"{user_input} is at {location}. Last information saved on {timestamp}. Is the item still there? (yes/no)"
+        session['confirm_item'] = user_input
         return jsonify({"message": response}), 200
 
     # If the item is not in the database, ask for location

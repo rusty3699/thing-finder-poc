@@ -4,7 +4,19 @@
         "timestamp": "2024-06-18 12:14:28"
     },
     "pen": {
-        "location": "desk",
-        "timestamp": "2024-06-18 12:15:18"
+        "location": "kapila",
+        "timestamp": "2024-06-18 12:27:46"
+    },
+    "bag": {
+        "location": "bme",
+        "timestamp": "2024-06-18 12:23:40"
+    },
+    "yes": {
+        "location": "pen",
+        "timestamp": "2024-06-18 12:22:34"
+    },
+    "cube": {
+        "location": "pen",
+        "timestamp": "2024-06-18 12:26:59"
     }
 }

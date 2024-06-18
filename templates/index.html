@@ -17,8 +17,9 @@
     </div>
     <script>
         async function interact() {
-            const userInput = document.getElementById('user_input').value;
+            const userInputElement = document.getElementById('user_input');
             const responseDiv = document.getElementById('response');
+            const userInput = userInputElement.value;
 
             const response = await fetch('/interact', {
                 method: 'POST',
@@ -30,6 +31,9 @@
 
             const result = await response.json();
             responseDiv.innerText = result.message || result.error;
+
+            // Clear the input box after submission
+            userInputElement.value = '';
         }
     </script>
 </body>
