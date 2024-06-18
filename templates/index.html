@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thing Finder</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Thing Finder</h1>
+        <div>
+            <input type="text" id="user_input" placeholder="Enter command, e.g., 'log keys at kitchen counter' or 'find keys'">
+            <button onclick="interact()">Submit</button>
+        </div>
+        <div id="response"></div>
+    </div>
+    <script>
+        async function interact() {
+            const userInput = document.getElementById('user_input').value;
+            const responseDiv = document.getElementById('response');
+
+            const response = await fetch('/interact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user_input=${encodeURIComponent(userInput)}`,
+            });
+
+            const result = await response.json();
+            responseDiv.innerText = result.message || result.error;
+        }
+    </script>
+</body>
+</html>
