@@ -19,8 +19,9 @@ This project is a Flask-based web application that allows users to log the locat
     ```
 
 2. **Create and activate a virtual environment:**
-    ```sh conda create --name [thing-finder-poc] python=3.8
-conda activate thing-finder-poc
+    ```sh 
+    conda create --name [thing-finder-poc] python=3.8
+    conda activate thing-finder-poc
     ```
 
 3. **Install the dependencies:**
