@@ -10,10 +10,11 @@ app.secret_key = 'supersecretkey'  # Required for session management
 DATA_FILE = 'data.json'
 
 def load_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as f:
-            return json.load(f)
-    return {}
+    if not os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'w') as f:
+            json.dump({}, f)
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
 
 def save_data(data):
     with open(DATA_FILE, 'w') as f:
