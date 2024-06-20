@@ -76,6 +76,7 @@ This project is a Flask-based web application that allows users to log the locat
 - Add a feature to delete the item from the list.
 - Integration of database for better data management. maybe mongodb.
 - Integrate with whatsapp bot. So that user can interact with the system using whatsapp. No need of anyweb interface. just type in whatsapp and get the location of the item. hassel free.
+- Can a make vercel website too for the same. So that user can interact with the system using the website.
 
 ---
 *Made with ❤️ Anish*
